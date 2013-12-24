@@ -59,7 +59,6 @@ while true; do
 	iwlist $WIFACE scan > /tmp/scan.tmp
 	sleep 3
 	awk --posix '$5 ~ /[0-9a-zA-F]{2}:/ && $5 !~ /'$ourAPmac'/ {print $5}' /tmp/scan.tmp > /tmp/APmacs.lst
-	#awk --posix '$5 ~ /[0-9a-zA-F]{2}:/ && $5 !~ /'$ourAPmac'/ {print $5}' /tmp/scan.tmp | xargs -I {} echo "aireplay -0 1 -D -a {}"
 	cat /tmp/scan.tmp | grep "Channel:" | cut -b 29 > /tmp/APchannels.lst
 	lineNum=`wc -l /tmp/APmacs.lst | awk '{ print $1}'`
 	curCHAN=`cat /tmp/APchannels.lst | head -n $curLine`
