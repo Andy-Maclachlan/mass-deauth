@@ -5,7 +5,7 @@ If you need to reach me for whatever reason, regarding this script, you can emai
 [1]: http://rfkiller.they.org "weblog"
 [2]: https://github.com/RFKiller/mass-deauth
 
-Mass-Deauth Script SHA1: 67ad4d6f586c03a63c8a2e5491261c526f66b74a
+Mass-Deauth Script SHA1: d0c0f682d48ee25ee150ae0ae9801dcc82f8dbb1
 
 RFKiller's Mass-Deauth Script TODO list:
 - [x] fix issue #1 (variable $ourAPmac being ignored)
