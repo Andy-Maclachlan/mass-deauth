@@ -5,6 +5,8 @@ If you need to reach me for whatever reason, regarding this script, you can emai
 [1]: http://rfkiller.they.org "weblog"
 [2]: https://github.com/RFKiller/mass-deauth
 
+SHA1: 67ad4d6f586c03a63c8a2e5491261c526f66b74a
+
 RFKiller's Mass-Deauth Script TODO list:
 - [x] fix issue #1 (variable $ourAPmac being ignored)
 - [x] add run-as-root check
