@@ -1,7 +1,5 @@
-DO NOT USE THIS SCRIPT AGAINST ANY NETWORKS YOU DON'T OWN
----------------------------------------------------------
-OR DO NOT HAVE WRITTEN EXPRESSED PERMISSION TO ATTACK
------------------------------------------------------
+DO NOT USE THIS SCRIPT AGAINST ANY NETWORKS YOU DON'T OWN OR DO NOT HAVE WRITTEN EXPRESSED PERMISSION TO ATTACK
+---------------------------------------------------------------------------------------------------------------
 
 If you need to reach me for whatever reason, regarding this script, you can email me <grant.c.stone@gmail.com>, make a comment regarding your issue on my [weblog][1], or via the GitHub [page][2] for this script.
 [1]: http://rfkiller.they.org "weblog"
