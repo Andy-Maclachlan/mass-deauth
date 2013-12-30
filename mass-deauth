@@ -4,8 +4,6 @@
 # Send all emails to <grant.c.stone@gmail.com>
 # Copyright (c) GPLv3 - 2013 RFKiller
 # Please see the LICENSE file that came with this program
-# PLEASE USE THIS SCRIPT RESPONSIBLY.
-# DO NOT USE ON NETWORKS YOU DON'T OWN OR DON'T HAVE PERMISSION TO ATTACK
 
 if [[ $EUID -ne 0 ]]; then
 	echo -e "\033[31m\n    [!] This script MUST be run as root. Aborting... [!]\033[0m\n" 1>&2
