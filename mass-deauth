@@ -88,20 +88,28 @@ while [[ ! $WIFACE ]]; do
 	sleep 1; echo
 done
 while [[ ! $DEAUTHS ]]; do
-	echo -e "\033[33m[>] How many deauthentication packets would you to send to each router?\033[0m"
+	echo -e "\033[33m[>] How many deauthentication packets would you to send to each router?\n[>] Hit [ENTER] to use the default (10)\033[0m"
 	read -e DEAUTHS
+	if [[ -z $DEAUTHS ]]; then
+		echo -e "\033[33m[>]Sending 10 deauthentication packets per round of attacks\033[0m"
+		DEAUTHS=10
+	fi
 	sleep 1; echo
 done
 while [[ ! $waitTime ]]; do
-	echo -e "\033[33m[>] How long would you like to wait (in seconds) between attacks?\033[0m"
+	echo -e "\033[33m[>] How long would you like to wait (in seconds) between attacks?\n[>] Hit [ENTER] to use the default (60 seconds)\033[0m"
 	read -e waitTime
+	if [[ -z $waitTime ]]; then
+		echo -e "\033[33m[>]Waiting 60 seconds between attacks\033[0m"
+		waitTime=60
+	fi
 	sleep 1; echo
 done
 while [[ ! $ourAPmac ]]; do
-	echo -e "\033[33m[>] Enter the MAC address of your router (so we don't attack it):\n[>] Or press [ENTER] to use the default ($suggestedAPmac):\033[0m"
+	echo -e "\033[33m[>] Enter the MAC address of your router (so we don't attack it):\n[>] Hit [ENTER] to use the default ($suggestedAPmac)\033[0m"
 	read -e ourAPmac
 	if [[ -z $ourAPmac ]]; then
-		echo -e "\033[33m[>] Using $suggestedAPmac as the MAC address for your router...\033[0m"
+		echo -e "\033[33m[>] Using $suggestedAPmac as the MAC address for your router\033[0m"
 		ourAPmac=$suggestedAPmac
 	fi
 	sleep 1; echo
