@@ -9,12 +9,23 @@ If you need to reach me for whatever reason, regarding this script, you can emai
 [5]: https://www.facebook.com/80211hacker "Trevelyn"
 [6]: http://weaknetlabs.com "WeakNet Labs"
 
-Mass-Deauth Script SHA1: bce33213f095d52ae39d80203c6803efa5b36e4e
+Mass-Deauth Script SHA1: f7525d7b437ec29278c17efe08b0835e30eb208d
 
 RFKiller's Mass-Deauth Script TODO list:
-- [ ] fix issue #1 (variable $ourAPmac being ignored)
+- [x] fix issue #1 (variable $ourAPmac being ignored)
 - [x] add run-as-root check
 - [x] check for required programs before running
 - [x] ask for user input so user doesn't need to edit script manually before running it.
-- [ ] add commandline arguments/options
-- [ ] give users choice of using commandline options or being asked for variables at runtime.
+- [x] add commandline arguments/options
+- [x] give users choice of using commandline options or being asked for variables at runtime.
+
+Usage: ./mass-deauth [OPTIONS] [ARGUMENTS]
+
+OPTIONS:
+-d    number of deauth packets to send per AP
+-h    show this help screen
+-i    wireless interface to use during attack
+-m    MAC of your AP (so we don't attack it)
+-w    wait time (in seconds) between attacks
+
+Example: ./mass-deauth -d 10 -w 30 -m 11:22:33:44:55:66 -i wlan0
