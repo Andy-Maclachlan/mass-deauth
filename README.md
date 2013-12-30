@@ -20,12 +20,4 @@ RFKiller's Mass-Deauth Script TODO list:
 - [x] give users choice of using commandline options or being asked for variables at runtime.
 
 Usage: ./mass-deauth [OPTIONS] [ARGUMENTS]
-
-OPTIONS:
--d    number of deauth packets to send per AP
--h    show this help screen
--i    wireless interface to use during attack
--m    MAC of your AP (so we don't attack it)
--w    wait time (in seconds) between attacks
-
 Example: ./mass-deauth -d 10 -w 30 -m 11:22:33:44:55:66 -i wlan0
