@@ -9,8 +9,6 @@ If you need to reach me for whatever reason, regarding this script, you can emai
 [5]: https://www.facebook.com/80211hacker "Trevelyn"
 [6]: http://weaknetlabs.com "WeakNet Labs"
 
-Mass-Deauth Script SHA1: 28e7e13681c58491bc42624220115fe5ef4aa8de
-
 RFKiller's Mass-Deauth Script TODO list:
 - [x] fix issue #1 (variable $ourAPmac being ignored)
 - [x] add run-as-root check
