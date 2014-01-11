@@ -17,6 +17,6 @@ RFKiller's Mass-Deauth Script TODO list:
 - [x] add commandline arguments/options
 - [x] give users choice of using commandline options or being asked for variables at runtime.
 
-Usage: ./mass-deauth [OPTIONS] [ARGUMENTS]
+Usage: ./mass-deauth.sh [OPTIONS] [ARGUMENTS]
 
-Example: ./mass-deauth -d 10 -w 30 -m 11:22:33:44:55:66 -i wlan0
+Example: ./mass-deauth.sh -d 10 -w 30 -m 11:22:33:44:55:66 -i wlan0
