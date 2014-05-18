@@ -1,9 +1,8 @@
 #!/bin/bash
 # Mass-Deauth Script by RFKiller <http://rfkiller.they.org>
-# Mass-Deauth Script homepage <https://github.com/RFKiller/mass-deauth>
 # Send all emails to <grant.c.stone@gmail.com>
 # Copyright (c) GPLv3 - 2013 RFKiller
-# Please see the LICENSE file that came with this program
+# Please see the LICENSE file that came with this script
 
 if [[ $EUID -ne 0 ]]; then
 	echo -e "\033[31m\n    [!] This script MUST be run as root. Aborting... [!]\033[0m\n" 1>&2
@@ -17,16 +16,6 @@ for i in airmon-ng aireplay-ng iw ip iwlist macchanger; do
 	}
 done
 
-function banner() {
-echo -e "\n                    \033[36m***************************************\033[0m"
-echo -e "                    \033[36m***************************************\033[0m"
-echo -e "                    \033[36m****\033[0m\033[33m RFKiller's Mass-Deauth Script \033[0m\033[36m****\033[0m"
-echo -e "                    \033[36m*********\033[0m\033[33m Written by RFKiller \033[0m\033[36m*********\033[0m"
-echo -e "                    \033[36m**\033[0m\033[33m With help from Justin Welenofsky \033[0m\033[36m***\033[0m"
-echo -e "                    \033[36m****\033[0m\033[33m And Trevelyn of WeakNet Labs \033[0m\033[36m*****\033[0m"
-echo -e "                    \033[36m***************************************\033[0m"
-echo -e "                    \033[36m***************************************\033[0m\n"
-}
 function usage() {
 	cat << EOF
 
@@ -54,7 +43,6 @@ function cleanup() {
 	airmon-ng stop $MIFACE &> /dev/null
 	echo -e "\033[31m[!] Removing logs and scan data...\033[0m\n"
 	sleep 1; rmlogs
-	echo -e "\033[32m    [!] Happy Hacking! [!]\033[0m\n"
 	exit 0
 }
 
@@ -80,7 +68,6 @@ ask_to_install="1" # Change to 0 or comment out this line to skip asking for ins
 suggestedAPmac=`arp -a | grep -E -o '[[:xdigit:]]{2}(:[[:xdigit:]]{2}){5}'`
 
 clear
-banner; sleep 1
 
 if [[ ! -e '/usr/bin/mass-deauth' && $ask_to_install = '1' ]];then
 	echo -e "\033[31m[!] Script is not installed. Do you want to install it? (y/n)\033[0m"
@@ -109,7 +96,7 @@ while [[ ! $DEAUTHS ]]; do
 	echo -e "\033[33m[>] How many deauthentication packets would you to send to each router?\n[>] Hit [ENTER] to use the default (10)\033[0m"
 	read -e DEAUTHS
 	if [[ -z $DEAUTHS ]]; then
-		echo -e "\033[33m[>]Sending 10 deauthentication packets per round of attacks\033[0m"
+		echo -e "\033[33m[!]Sending 10 deauthentication packets per round of attacks\033[0m"
 		DEAUTHS=10
 	fi
 	sleep 1; echo
@@ -118,7 +105,7 @@ while [[ ! $waitTime ]]; do
 	echo -e "\033[33m[>] How long would you like to wait (in seconds) between attacks?\n[>] Hit [ENTER] to use the default (60 seconds)\033[0m"
 	read -e waitTime
 	if [[ -z $waitTime ]]; then
-		echo -e "\033[33m[>]Waiting 60 seconds between attacks\033[0m"
+		echo -e "\033[33m[!]Waiting 60 seconds between attacks\033[0m"
 		waitTime=60
 	fi
 	sleep 1; echo
@@ -127,7 +114,7 @@ while [[ ! $ourAPmac ]]; do
 	echo -e "\033[33m[>] Enter the MAC address of your router (so we don't attack it):\n[>] Hit [ENTER] to use the default ($suggestedAPmac)\033[0m"
 	read -e ourAPmac
 	if [[ -z $ourAPmac ]]; then
-		echo -e "\033[33m[>] Using $suggestedAPmac as the MAC address for your router\033[0m"
+		echo -e "\033[33m[!] Using $suggestedAPmac as the MAC address for your router\033[0m"
 		ourAPmac=$suggestedAPmac
 	fi
 	sleep 1; echo
