@@ -1,7 +1,7 @@
 DO NOT USE THIS SCRIPT AGAINST NETWORKS YOU DON'T OWN OR DON'T HAVE PERMISSION TO ATTACK!
 -----------------------------------------------------------------------------------------
 
-If you need to reach me for whatever reason, regarding this script, you can email me <grant.c.stone@gmail.com>, or via the GitHub [page][1] for this script. This script was originally heavily influenced by [Leg3nd's Elegant Mass DeAuth Script][2], and greatly improved with help from [Trevelyn][3] of [WeakNet Labs][4] as well as some suggestions by Justin Welenofsky (hope I spelled that right).
+If you need to reach me for whatever reason, regarding this script, you can email me <rfkiller@openmailbox.com>, or via the GitHub [page][1] for this script. This script was originally heavily influenced by [Leg3nd's Elegant Mass DeAuth Script][2], and greatly improved with help from [Trevelyn][3] of [WeakNet Labs][4] as well as some suggestions by Justin Welenofsky (hope I spelled that right).
 [1]: https://github.com/RFKiller/mass-deauth
 [2]: http://jasagerpwn.googlecode.com/svn/trunk/src/deauth.sh
 [3]: https://www.facebook.com/80211hacker "Trevelyn"
